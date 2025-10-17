@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiabi - Variateur de Teint de Peau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.sh/@google/genai@^1.4.0"
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-gradient-to-br from-slate-50 to-blue-50 font-['Inter'] text-gray-800 antialiased">
+    <!-- Logo Kiabi centré -->
+    <div class="flex flex-col items-center pt-8 pb-4">
+      <img 
+        src="./logo-kiabi.png" 
+        alt="Logo Kiabi" 
+        class="h-20 w-auto opacity-90 hover:opacity-100 transition-opacity duration-300"
+      />
+      <h2 class="text-xl font-semibold text-gray-700 mt-3 tracking-wide">Model Variation Beta</h2>
+    </div>
+
+    <main
+      class="min-h-screen flex items-center justify-center p-4 pt-8"
+      role="main"
+    >
+      <div
+        class="bg-white p-8 rounded-2xl shadow-xl border border-pink-100 w-full max-w-8xl"
+      >
+        <!-- Left Column: Controls & Original Image -->
+        <div class="flex flex-col space-y-4 mb-8 lg:mb-0 lg:w-1/4 lg:float-left lg:pr-8">
+          <div class="text-center lg:text-left">
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">
+              Variateur de Teint de Peau
+            </h1>
+              <p class="text-gray-600 mt-2 text-sm">
+                Téléchargez une photo pour générer des versions avec différents teints de peau, tout en conservant la tenue et la pose inchangées.
+              </p>
+          </div>
+
+          <div class="flex-grow flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center hover:border-slate-400 hover:shadow-xl transition-all duration-500 group relative overflow-hidden">
+            <!-- Effet de fond animé -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            
+            <input type="file" id="image-upload" class="hidden" accept="image/*" />
+            <label
+              for="image-upload"
+              class="cursor-pointer group-hover:scale-105 transition-all duration-500 relative z-10"
+            >
+              <!-- Icône d'upload moderne avec animation -->
+              <div class="w-24 h-24 bg-gradient-to-br from-slate-500 via-slate-600 to-blue-700 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
+                <svg class="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+              </div>
+              
+              <!-- Texte principal -->
+              <h3 class="text-2xl font-black text-gray-800 mb-3 group-hover:text-slate-700 transition-colors duration-300">
+                Choisir une image
+              </h3>
+              <p class="text-base text-gray-600 mb-6 leading-relaxed">
+                Glissez-déposez votre photo ici<br>
+                <span class="text-sm text-gray-500">ou cliquez pour parcourir vos fichiers</span>
+              </p>
+              
+            </label>
+          </div>
+
+          <div id="preview-container" class="hidden">
+            <div class="bg-white rounded-2xl p-4 shadow-lg border border-slate-100">
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-bold text-gray-800 flex items-center">
+                  <svg class="w-5 h-5 text-slate-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Image originale
+                </h2>
+                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              </div>
+              <div class="relative overflow-hidden rounded-xl">
+                <img
+                  id="original-image"
+                  alt="Aperçu de l'image téléchargée"
+                  class="w-full rounded-xl object-contain max-h-64 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl"></div>
+              </div>
+            </div>
+          </div>
+
+
+            <button
+              id="generate-button"
+              class="w-full bg-gradient-to-r from-slate-600 via-slate-700 to-blue-800 hover:from-slate-700 hover:via-slate-800 hover:to-blue-900 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-slate-300 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              disabled
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <span>Générer les Variations</span>
+            </button>
+
+          <p id="status" class="text-center text-gray-600 min-h-[24px]"></p>
+        </div>
+
+        <!-- Right Column: Generated Images Gallery -->
+        <div class="space-y-8 lg:w-3/4 lg:float-right">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-slate-600 to-blue-700 rounded-2xl mb-4 shadow-lg">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+              <h2 class="text-3xl font-black text-gray-800 mb-2">Variations Générées</h2>
+          </div>
+          
+          <div
+            id="output-gallery"
+            class="grid grid-cols-3 gap-6 min-h-[600px]"
+          >
+            <!-- Gallery items will be injected here -->
+          </div>
+        </div>
+        
+        <!-- Clearfix pour les floats -->
+        <div class="clear-both"></div>
+      </div>
+    </main>
+
+    <script type="module" src="index.tsx"></script>
+  </body>
+</html>

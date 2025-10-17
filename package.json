@@ -1,0 +1,22 @@
+{
+  "name": "skin-tone-variator",
+  "version": "1.0.0",
+  "description": "Application de variation de teint de peau avec IA",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "docker-compose up --build",
+    "build": "docker-compose build",
+    "start": "docker-compose up",
+    "audit": "npm audit --omit=dev",
+    "audit:fix": "npm audit fix --omit=dev"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
