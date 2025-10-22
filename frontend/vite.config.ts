@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/skin-tone-variator/',
+  base: '/',
   server: {
     port: 4000,
     host: true
