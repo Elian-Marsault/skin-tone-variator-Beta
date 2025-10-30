@@ -32,7 +32,7 @@ let originalImageMimeType: string | null = null;
 
 // --- API Configuration ---
 // L'API est maintenant gérée par le backend proxy
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // --- Utility Functions ---
 function fileToGenerativePart(file: File) {
