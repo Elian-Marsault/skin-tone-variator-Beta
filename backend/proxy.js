@@ -21,7 +21,10 @@ const limiter = rateLimit({
 
 // Middleware
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:4000'],
+  origin: [
+    'http://localhost:4000',
+    'https://skin-tone-variator-beta-front.onrender.com'
+  ],
   credentials: true,
   optionsSuccessStatus: 200
 };
