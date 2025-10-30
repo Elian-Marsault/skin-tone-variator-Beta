@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const { GoogleGenAI, Modality } = require('@google/genai');
 const cors = require('cors');
@@ -73,7 +74,7 @@ function validateImage(imageBase64, mimeType) {
 // Proxy endpoint pour la génération d'images
 app.post('/api/generate-variation', async (req, res) => {
   try {
-    const { imageBase64, mimeType, ethnicity } = req.body;
+    const { imageBase64, mimeType, ethnicity, bodyType } = req.body;
 
     if (!imageBase64 || !mimeType || !ethnicity) {
       return res.status(400).json({ 
@@ -90,13 +91,13 @@ app.post('/api/generate-variation', async (req, res) => {
       });
     }
 
-    const prompt = `Vous êtes un outil d'édition d'images précis. Votre SEULE fonction est de modifier l'ethnicité de la personne dans l'image fournie pour ${ethnicity}. Vous devez respecter strictement les règles suivantes, en traitant l'image originale comme un modèle fixe.
-RÈGLES CRITIQUES - LA SORTIE DOIT ÊTRE IDENTIQUE À L'ORIGINAL SAUF POUR L'ETHNICITÉ :
-VÊTEMENTS : NE modifiez PAS les vêtements, le tissu, la couleur ou le style de quelque manière que ce soit. Ils doivent être IDENTIQUES.
-POSE ET EXPRESSION : La pose de la personne, l'expression faciale et la position du corps DOIVENT rester INCHANGÉES.
-ACCESSOIRES ET COIFFURE : NE changez PAS les accessoires (bijoux, lunettes, etc.). Vous pouvez adapter la coiffure de la personne selon l'ethnicité.
-ARRIÈRE-PLAN ET ÉCLAIRAGE : L'arrière-plan, le décor et l'éclairage de l'image DOIVENT être IDENTIQUES à l'original.
-Votre seule modification concerne le teint de peau et les caractéristiques ethniques de la personne pour représenter avec précision un individu ${ethnicity}. Tous les autres éléments de l'image sont non négociables et doivent être préservés exactement comme dans l'original.`;
+    const prompt = `You are a precise image editing tool. Your ONLY function is to modify the ethnicity of the person in the provided image to ${ethnicity}${bodyType ? ` and their body type to ${bodyType}` : ''}. You must strictly follow these rules, treating the original image as a fixed template.
+CRITICAL RULES - THE OUTPUT MUST BE IDENTICAL TO THE ORIGINAL EXCEPT FOR ETHNICITY${bodyType ? ' AND BODY TYPE' : ''}:
+CLOTHING: DO NOT modify clothing, fabric, color or style in any way. They must be IDENTICAL.
+POSE AND EXPRESSION: The person's pose, facial expression and body position MUST remain UNCHANGED.
+ACCESSORIES AND HAIRSTYLE: DO NOT change accessories (jewelry, glasses, etc.). You may adapt the person's hairstyle according to ethnicity.
+BACKGROUND AND LIGHTING: The background, setting and lighting of the image MUST be IDENTICAL to the original.
+Your modifications concern: 1) The skin tone and ethnic characteristics to accurately represent a ${ethnicity} individual${bodyType ? `, and 2) The body type and physique to represent a ${bodyType} person` : ''}. All other elements of the image are non-negotiable and must be preserved exactly as in the original.`;
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     const response = await ai.models.generateContent({
