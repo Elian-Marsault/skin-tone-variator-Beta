@@ -1,4 +1,3 @@
-require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const { GoogleGenAI, Modality } = require('@google/genai');
 const cors = require('cors');
@@ -74,7 +73,7 @@ function validateImage(imageBase64, mimeType) {
 // Proxy endpoint pour la génération d'images
 app.post('/api/generate-variation', async (req, res) => {
   try {
-    const { imageBase64, mimeType, ethnicity, bodyType } = req.body;
+    const { imageBase64, mimeType, ethnicity } = req.body;
 
     if (!imageBase64 || !mimeType || !ethnicity) {
       return res.status(400).json({ 
@@ -91,13 +90,13 @@ app.post('/api/generate-variation', async (req, res) => {
       });
     }
 
-    const prompt = `You are a precise image editing tool. Your ONLY function is to modify the ethnicity of the person in the provided image to ${ethnicity}${bodyType ? ` and their body type to ${bodyType}` : ''}. You must strictly follow these rules, treating the original image as a fixed template.
-CRITICAL RULES - THE OUTPUT MUST BE IDENTICAL TO THE ORIGINAL EXCEPT FOR ETHNICITY${bodyType ? ' AND BODY TYPE' : ''}:
+    const prompt = `You are a precise image editing tool. Your ONLY function is to modify the ethnicity of the person in the provided image to ${ethnicity}. You must strictly follow the following rules, treating the original image as a fixed template.
+CRITICAL RULES - THE OUTPUT MUST BE IDENTICAL TO THE ORIGINAL EXCEPT FOR ETHNICITY:
 CLOTHING: DO NOT modify clothing, fabric, color or style in any way. They must be IDENTICAL.
 POSE AND EXPRESSION: The person's pose, facial expression and body position MUST remain UNCHANGED.
 ACCESSORIES AND HAIRSTYLE: DO NOT change accessories (jewelry, glasses, etc.). You may adapt the person's hairstyle according to ethnicity.
 BACKGROUND AND LIGHTING: The background, setting and lighting of the image MUST be IDENTICAL to the original.
-Your modifications concern: 1) The skin tone and ethnic characteristics to accurately represent a ${ethnicity} individual${bodyType ? `, and 2) The body type and physique to represent a ${bodyType} person` : ''}. All other elements of the image are non-negotiable and must be preserved exactly as in the original.`;
+Your only modification concerns the skin tone and ethnic characteristics of the person to accurately represent a ${ethnicity} individual. All other elements of the image are non-negotiable and must be preserved exactly as in the original.`;
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     const response = await ai.models.generateContent({
