@@ -9,8 +9,8 @@ const port = process.env.PORT || 3001;
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // Limite à 50 requêtes par IP par fenêtre (augmenté pour les tests)
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 500, // Limite à 500 requêtes par IP par heure
   message: {
     error: 'Trop de requêtes, veuillez réessayer plus tard.',
     isQuotaError: true
