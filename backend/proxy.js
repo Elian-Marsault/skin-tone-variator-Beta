@@ -96,6 +96,7 @@ CLOTHING: DO NOT modify clothing, fabric, color or style in any way. They must b
 POSE AND EXPRESSION: The person's pose, facial expression and body position MUST remain UNCHANGED.
 ACCESSORIES AND HAIRSTYLE: DO NOT change accessories (jewelry, glasses, etc.). You may adapt the person's hairstyle according to ethnicity.
 BACKGROUND AND LIGHTING: The background, setting and lighting of the image MUST be IDENTICAL to the original.
+SKIN TONE CONSISTENCY: CRITICAL - You must apply the SAME uniform skin tone throughout the ENTIRE visible body, including ALL body parts: face, neck, arms, hands (including fingers, palms, and back of hands), legs, feet, and any other exposed skin areas. The skin tone must be perfectly consistent and natural across all visible body parts. Pay special attention to hands, wrists, and joints to ensure they match the face and other body parts exactly.
 Your only modification concerns the skin tone and ethnic characteristics of the person to accurately represent a ${ethnicity} individual. All other elements of the image are non-negotiable and must be preserved exactly as in the original.`;
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
