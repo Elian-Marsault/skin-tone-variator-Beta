@@ -26,15 +26,6 @@ const ETHNICITIES = [
   'Blanc',
 ];
 
-const BODY_TYPES = [
-  'Slim',
-  'Athletic',
-  'Average',
-  'Curvy',
-  'Plus-size',
-  'Muscular',
-];
-
 // --- State Variables ---
 let originalImageBase64: string | null = null;
 let originalImageMimeType: string | null = null;
@@ -72,7 +63,6 @@ function setControlsDisabled(disabled: boolean) {
 async function generateSingleVariation(
   ethnicity: string,
   galleryItem: HTMLDivElement,
-  bodyType?: string,
 ) {
   const imgEl = galleryItem.querySelector('img') as HTMLImageElement;
   const loadingIndicator = galleryItem.querySelector('.absolute.inset-0.flex') as HTMLDivElement;
@@ -90,8 +80,7 @@ async function generateSingleVariation(
       body: JSON.stringify({
         imageBase64: originalImageBase64,
         mimeType: originalImageMimeType,
-        ethnicity: ethnicity,
-        bodyType: bodyType
+        ethnicity: ethnicity
       })
     });
 
@@ -259,29 +248,17 @@ async function generateSingleVariation(
   }
 }
 
-// Fonction pour créer toutes les combinaisons d'ethnicité et de corpulence
-function createCombinations() {
-  const combinations = [];
-  for (const ethnicity of ETHNICITIES) {
-    for (const bodyType of BODY_TYPES) {
-      combinations.push({ ethnicity, bodyType });
-    }
-  }
-  return combinations;
-}
-
 async function generate() {
   statusEl.innerText = 'Génération des variations...';
   setControlsDisabled(true);
   setupGallery();
 
-  const combinations = createCombinations();
   const galleryItems = Array.from(
     outputGalleryEl.children,
   ) as HTMLDivElement[];
 
-  const generationPromises = combinations.map((combo, index) =>
-    generateSingleVariation(combo.ethnicity, galleryItems[index], combo.bodyType),
+  const generationPromises = ETHNICITIES.map((ethnicity, index) =>
+    generateSingleVariation(ethnicity, galleryItems[index]),
   );
 
   const results = await Promise.allSettled(generationPromises);
@@ -296,14 +273,14 @@ async function generate() {
     (r.reason.message.includes('quota') || r.reason.message.includes('429'))
   ).length;
 
-  if (successfulGenerations === combinations.length) {
+  if (successfulGenerations === ETHNICITIES.length) {
     statusEl.innerText = 'Variations générées avec succès.';
   } else if (quotaErrors > 0) {
     showStatusError(
-      `Quota API dépassé. ${successfulGenerations}/${combinations.length} variations générées. Attendez 24h ou passez à un plan payant.`
+      `Quota API dépassé. ${successfulGenerations}/${ETHNICITIES.length} variations générées. Attendez 24h ou passez à un plan payant.`
     );
   } else if (successfulGenerations > 0) {
-    statusEl.innerText = `Généré ${successfulGenerations}/${combinations.length} variations. Certaines ont échoué.`;
+    statusEl.innerText = `Généré ${successfulGenerations}/${ETHNICITIES.length} variations. Certaines ont échoué.`;
   } else {
     showStatusError(
       'Impossible de générer des variations. Vérifiez votre clé API et votre quota.',
@@ -315,15 +292,14 @@ async function generate() {
 
 function setupGallery() {
   outputGalleryEl.innerHTML = ''; // Clear previous results
-  const combinations = createCombinations();
-  for (const combo of combinations) {
+  for (const ethnicity of ETHNICITIES) {
     const galleryItem = document.createElement('div');
     galleryItem.className =
       'group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:scale-105 hover:-translate-y-2 border border-slate-200/50 backdrop-blur-sm';
     galleryItem.innerHTML = `
       <!-- Image container avec effet glassmorphism -->
       <div class="aspect-[4/5] relative overflow-hidden bg-gradient-to-br from-slate-50 to-blue-50">
-        <img src="" alt="Image générée pour ${combo.ethnicity} - ${combo.bodyType}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 ease-out"/>
+        <img src="" alt="Image générée pour ${ethnicity}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 ease-out"/>
         
         <!-- Overlay avec effet de brillance -->
         <div class="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -341,7 +317,7 @@ function setupGallery() {
         </div>
         
         <!-- Bouton plein écran -->
-        <button class="absolute top-3 left-3 w-10 h-10 bg-white/90 fullscreen-btn rounded-full flex items-center justify-center shadow-lg opacity-100 transition-all duration-300 hover:bg-white hover:scale-110" onclick="openFullscreen('${combo.ethnicity.replace(/'/g, "\\'")} - ${combo.bodyType}')" title="Voir en plein écran">
+        <button class="absolute top-3 left-3 w-10 h-10 bg-white/90 fullscreen-btn rounded-full flex items-center justify-center shadow-lg opacity-100 transition-all duration-300 hover:bg-white hover:scale-110" onclick="openFullscreen('${ethnicity.replace(/'/g, "\\'")}')" title="Voir en plein écran">
           <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
           </svg>
@@ -354,8 +330,7 @@ function setupGallery() {
       <!-- Contenu de la carte -->
       <div class="p-4 bg-white">
         <div class="text-center">
-          <h3 class="text-sm font-semibold text-gray-800">${combo.ethnicity}</h3>
-          <p class="text-xs text-gray-600 mt-1">${combo.bodyType}</p>
+          <h3 class="text-sm font-semibold text-gray-800">${ethnicity}</h3>
         </div>
       </div>
       
